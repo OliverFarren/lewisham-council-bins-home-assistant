@@ -1,4 +1,4 @@
-# Lewisham Council — Home Assistant Integration
+# Lewisham Council Bin Collections — Home Assistant Integration
 
 A [HACS](https://hacs.xyz) custom integration that adds waste collection
 schedule sensors for Lewisham addresses to Home Assistant.
@@ -16,10 +16,10 @@ schedule sensors for Lewisham addresses to Home Assistant.
 ## Installation via HACS
 
 1. Add this repository as a custom repository in HACS (category: Integration).
-2. Install **Lewisham Council**.
+2. Install **Lewisham Council Bin Collections**.
 3. Restart Home Assistant.
 4. Go to **Settings → Devices & Services → Add integration** and search for
-   *Lewisham Council*.
+   *Lewisham Council Bin Collections*.
 
 ## Manual installation
 
