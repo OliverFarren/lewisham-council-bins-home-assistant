@@ -1,4 +1,4 @@
-# Lewisham Council Bin Collections — Home Assistant Integration
+# ![Lewisham Council Bin Collections](custom_components/lewisham_council/icon.png) Lewisham Council Bin Collections — Home Assistant Integration
 
 A [HACS](https://hacs.xyz) custom integration that adds waste collection
 schedule sensors for Lewisham addresses to Home Assistant.
@@ -9,7 +9,12 @@ schedule sensors for Lewisham addresses to Home Assistant.
   exact address. The UPRN is stored; no re-search is needed on restart.
 - One `sensor` per waste stream (Food Waste, Recycling, Refuse) with
   `device_class: date` so the next collection date displays cleanly on
-  dashboards. Frequency, weekday, and date-basis are available as attributes.
+  dashboards.
+- Attributes on each sensor: `frequency`, `day`, `next_collection_basis`,
+  `days_until_collection` (integer), and `collection_in` (e.g. `"today"`,
+  `"tomorrow"`, `"4 days"`).
+- Clean entity IDs: `sensor.lewisham_council_food_waste` etc. — not tied to the
+  address string.
 - A single device per address, grouped in the HA device registry.
 - Automatic polling every 12 hours via HA's shared coordinator pattern.
 
@@ -40,10 +45,6 @@ uv run pytest -v
 uv run ruff check .
 uv run mypy custom_components/lewisham_council/
 ```
-
-## Planned
-
-- `v0.2.0`: calendar entity with recurrence expansion for fortnightly streams.
 
 ## Licence
 

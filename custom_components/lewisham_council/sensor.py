@@ -6,6 +6,7 @@ import logging
 import re
 from datetime import date
 
+import homeassistant.util.dt as dt_util
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -23,6 +24,22 @@ _LOGGER = logging.getLogger(__name__)
 def _slug(waste_type: str) -> str:
     """Convert a waste-type string (e.g. 'Food Waste') to a stable lowercase slug."""
     return re.sub(r"[^a-z0-9]+", "_", waste_type.lower()).strip("_")
+
+
+def _days_until(next_collection: date | None) -> int | None:
+    if next_collection is None:
+        return None
+    return (next_collection - dt_util.now().date()).days
+
+
+def _collection_in(days: int | None) -> str | None:
+    if days is None:
+        return None
+    if days == 0:
+        return "today"
+    if days == 1:
+        return "tomorrow"
+    return f"{days} days"
 
 
 async def async_setup_entry(
@@ -61,8 +78,10 @@ class LewishamCollectionSensor(CoordinatorEntity[LewishamUpdateCoordinator], Sen
     ) -> None:
         super().__init__(coordinator)
         self._waste_type = collection.waste_type
-        self._attr_unique_id = f"{coordinator.uprn}_{_slug(collection.waste_type)}"
+        slug = _slug(collection.waste_type)
+        self._attr_unique_id = f"{coordinator.uprn}_{slug}"
         self._attr_name = collection.waste_type
+        self.entity_id = f"sensor.lewisham_council_{slug}"
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, coordinator.uprn)},
             name=coordinator.address,
@@ -90,15 +109,18 @@ class LewishamCollectionSensor(CoordinatorEntity[LewishamUpdateCoordinator], Sen
         return super().available and self._current_entry() is not None
 
     @property
-    def extra_state_attributes(self) -> dict[str, str | None]:
-        """Return frequency, weekday, basis, and provenance of the current data."""
+    def extra_state_attributes(self) -> dict[str, str | int | None]:
+        """Return frequency, weekday, basis, provenance, and relative timing."""
         entry = self._current_entry()
         if entry is None:
             return {}
+        days = _days_until(entry.next_collection)
         return {
             "frequency": entry.frequency,
             "day": entry.day,
             "next_collection_basis": entry.next_collection_basis,
             "source_url": self.coordinator.data.source_url,
             "fetched_at": self.coordinator.data.fetched_at.isoformat(),
+            "days_until_collection": days,
+            "collection_in": _collection_in(days),
         }

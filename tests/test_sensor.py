@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+import homeassistant.util.dt as dt_util
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
@@ -98,3 +100,74 @@ async def test_sensor_device_class_is_date(
     state = hass.states.get(_entity_id(hass, "food_waste"))
     assert state is not None
     assert state.attributes.get("device_class") == SensorDeviceClass.DATE
+
+
+async def test_entity_id_uses_lewisham_council_prefix(
+    hass: HomeAssistant, loaded_entry: MockConfigEntry
+) -> None:
+    """Entity IDs use the lewisham_council_ prefix, not the address."""
+    assert _entity_id(hass, "food_waste") == "sensor.lewisham_council_food_waste"
+    assert _entity_id(hass, "recycling") == "sensor.lewisham_council_recycling"
+    assert _entity_id(hass, "refuse") == "sensor.lewisham_council_refuse"
+
+
+async def test_unique_id_is_uprn_and_waste_type(
+    hass: HomeAssistant, loaded_entry: MockConfigEntry
+) -> None:
+    """Unique IDs remain scoped to UPRN + waste stream for stable identification."""
+    ent_reg = er.async_get(hass)
+    entry = ent_reg.async_get(_entity_id(hass, "food_waste"))
+    assert entry is not None
+    assert entry.unique_id == f"{MOCK_UPRN}_food_waste"
+
+
+async def _refresh_with_frozen_time(
+    hass: HomeAssistant, loaded_entry: MockConfigEntry, frozen: datetime
+) -> None:
+    with patch("homeassistant.util.dt.now", return_value=frozen):
+        await loaded_entry.runtime_data.async_refresh()
+        await hass.async_block_till_done()
+
+
+async def test_days_until_collection_n_days(
+    hass: HomeAssistant, loaded_entry: MockConfigEntry
+) -> None:
+    """days_until_collection and collection_in reflect days when N > 1."""
+    # MOCK_SCHEDULE food_waste next_collection = 2026-07-07; 4 days from 2026-07-03
+    frozen = datetime(2026, 7, 3, 12, 0, tzinfo=dt_util.UTC)
+    await _refresh_with_frozen_time(hass, loaded_entry, frozen)
+    attrs = hass.states.get(_entity_id(hass, "food_waste")).attributes
+    assert attrs["days_until_collection"] == 4
+    assert attrs["collection_in"] == "4 days"
+
+
+async def test_days_until_collection_tomorrow(
+    hass: HomeAssistant, loaded_entry: MockConfigEntry
+) -> None:
+    """collection_in is 'tomorrow' when the collection is 1 day away."""
+    frozen = datetime(2026, 7, 6, 12, 0, tzinfo=dt_util.UTC)
+    await _refresh_with_frozen_time(hass, loaded_entry, frozen)
+    attrs = hass.states.get(_entity_id(hass, "food_waste")).attributes
+    assert attrs["days_until_collection"] == 1
+    assert attrs["collection_in"] == "tomorrow"
+
+
+async def test_days_until_collection_today(
+    hass: HomeAssistant, loaded_entry: MockConfigEntry
+) -> None:
+    """collection_in is 'today' on the day of collection."""
+    frozen = datetime(2026, 7, 7, 12, 0, tzinfo=dt_util.UTC)
+    await _refresh_with_frozen_time(hass, loaded_entry, frozen)
+    attrs = hass.states.get(_entity_id(hass, "food_waste")).attributes
+    assert attrs["days_until_collection"] == 0
+    assert attrs["collection_in"] == "today"
+
+
+async def test_days_until_collection_none_when_no_date(
+    hass: HomeAssistant, loaded_entry: MockConfigEntry
+) -> None:
+    """days_until_collection and collection_in are None when no date is published."""
+    # Refuse has next_collection=None in MOCK_SCHEDULE
+    attrs = hass.states.get(_entity_id(hass, "refuse")).attributes
+    assert attrs["days_until_collection"] is None
+    assert attrs["collection_in"] is None
