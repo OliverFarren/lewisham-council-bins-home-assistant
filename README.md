@@ -8,6 +8,9 @@
 
 # Lewisham Council Bin Collections — Home Assistant Integration
 
+[![Test](https://github.com/OliverFarren/lewisham-council-bins-home-assistant/actions/workflows/test.yml/badge.svg)](https://github.com/OliverFarren/lewisham-council-bins-home-assistant/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/OliverFarren/lewisham-council-bins-home-assistant/branch/main/graph/badge.svg)](https://codecov.io/gh/OliverFarren/lewisham-council-bins-home-assistant)
+
 A [HACS](https://hacs.xyz) custom integration that adds waste collection
 schedule sensors for Lewisham addresses to Home Assistant.
 

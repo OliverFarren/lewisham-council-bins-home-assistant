@@ -11,6 +11,7 @@ dependencies = []
 dev = [
     "lewisham-council-client==0.1.0",
     "pytest-homeassistant-custom-component",
+    "pytest-cov>=6.0",
     "ruff>=0.9",
     "mypy>=1.14",
 ]

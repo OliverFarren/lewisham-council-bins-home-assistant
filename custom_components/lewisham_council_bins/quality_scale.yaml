@@ -6,7 +6,7 @@ rules:
   appropriate-polling: done
   brands: todo            # requires PR to home-assistant/brands
   common-modules: done
-  config-flow-test-coverage: todo   # verify 100% flow coverage
+  config-flow-test-coverage: done
   config-flow: done
   dependency-transparency: todo     # confirm client is public + licensed on PyPI
   docs-actions:

@@ -1,3 +1,4 @@
+.env
 .idea/
 .venv/
 __pycache__/
@@ -8,3 +9,6 @@ __pycache__/
 .pytest_cache/
 *.egg-info/
 dist/
+.coverage
+coverage.xml
+htmlcov/

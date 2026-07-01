@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
-from lewisham_client import UpstreamUnavailableError
+from lewisham_client import DomainError, InvalidAddressSearchError, UpstreamUnavailableError
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.lewisham_council_bins.const import CONF_ADDRESS, CONF_UPRN, DOMAIN
@@ -121,6 +121,46 @@ async def test_upstream_unavailable_shows_cannot_connect(hass: HomeAssistant) ->
 
     assert result["type"] == FlowResultType.FORM
     assert result["errors"] == {"base": "cannot_connect"}
+
+
+async def test_invalid_query_shows_error(hass: HomeAssistant) -> None:
+    """A malformed search query shows an invalid_query error."""
+    mock_service = AsyncMock()
+    mock_service.lookup_addresses.side_effect = InvalidAddressSearchError("too short")
+    with (
+        patch("custom_components.lewisham_council_bins.config_flow.LewishamClient"),
+        patch(
+            "custom_components.lewisham_council_bins.config_flow.LewishamService",
+            return_value=mock_service,
+        ),
+    ):
+        result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": "user"})
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], user_input={"query": "?"}
+        )
+
+    assert result["type"] == FlowResultType.FORM
+    assert result["errors"] == {"query": "invalid_query"}
+
+
+async def test_unexpected_domain_error_shows_unknown(hass: HomeAssistant) -> None:
+    """An unanticipated domain error shows a generic unknown error."""
+    mock_service = AsyncMock()
+    mock_service.lookup_addresses.side_effect = DomainError("boom")
+    with (
+        patch("custom_components.lewisham_council_bins.config_flow.LewishamClient"),
+        patch(
+            "custom_components.lewisham_council_bins.config_flow.LewishamService",
+            return_value=mock_service,
+        ),
+    ):
+        result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": "user"})
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], user_input={"query": "SE13 1AA"}
+        )
+
+    assert result["type"] == FlowResultType.FORM
+    assert result["errors"] == {"base": "unknown"}
 
 
 async def test_duplicate_uprn_aborts(hass: HomeAssistant) -> None:
