@@ -9,13 +9,20 @@
 # Lewisham Council Bin Collections — Home Assistant Integration
 
 [![Test](https://github.com/OliverFarren/lewisham-council-bins-home-assistant/actions/workflows/test.yml/badge.svg)](https://github.com/OliverFarren/lewisham-council-bins-home-assistant/actions/workflows/test.yml)
+[![Validate](https://github.com/OliverFarren/lewisham-council-bins-home-assistant/actions/workflows/validate.yml/badge.svg)](https://github.com/OliverFarren/lewisham-council-bins-home-assistant/actions/workflows/validate.yml)
 [![codecov](https://codecov.io/gh/OliverFarren/lewisham-council-bins-home-assistant/branch/main/graph/badge.svg)](https://codecov.io/gh/OliverFarren/lewisham-council-bins-home-assistant)
+[![Python](https://img.shields.io/badge/Python-3.13%20%7C%203.14-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Latest release](https://img.shields.io/github/v/release/OliverFarren/lewisham-council-bins-home-assistant)](https://github.com/OliverFarren/lewisham-council-bins-home-assistant/releases/latest)
 
 A [HACS](https://hacs.xyz) custom integration that retrieves household waste
 collection schedules from [Lewisham Council's bin collection
 service](https://lewisham.gov.uk/myservices/recycling-and-rubbish/your-bins/collection)
 and adds them to Home Assistant. It is intended for residential addresses in
 the London Borough of Lewisham.
+
+This is an unofficial community integration and is not affiliated with or
+endorsed by Lewisham Council. It relies on undocumented public endpoints that
+may change without notice.
 
 ## What it provides
 

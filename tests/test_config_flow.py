@@ -103,10 +103,13 @@ async def test_no_addresses_found_shows_error(hass: HomeAssistant) -> None:
     assert result["errors"] == {"query": "no_addresses_found"}
 
 
-async def test_upstream_unavailable_shows_cannot_connect(hass: HomeAssistant) -> None:
-    """A network failure during address search shows a cannot_connect error."""
+async def test_upstream_unavailable_recovers(hass: HomeAssistant) -> None:
+    """The flow should recover when address search succeeds on retry."""
     mock_service = AsyncMock()
-    mock_service.lookup_addresses.side_effect = UpstreamUnavailableError("timeout")
+    mock_service.lookup_addresses.side_effect = [
+        UpstreamUnavailableError("timeout"),
+        MOCK_CANDIDATES,
+    ]
     with (
         patch("custom_components.lewisham_council_bins.config_flow.LewishamClient"),
         patch(
@@ -119,8 +122,16 @@ async def test_upstream_unavailable_shows_cannot_connect(hass: HomeAssistant) ->
             result["flow_id"], user_input={"query": "SE13 1AA"}
         )
 
+        assert result["type"] == FlowResultType.FORM
+        assert result["errors"] == {"base": "cannot_connect"}
+
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], user_input={"query": "SE13 1AA"}
+        )
+
     assert result["type"] == FlowResultType.FORM
-    assert result["errors"] == {"base": "cannot_connect"}
+    assert result["step_id"] == "select"
+    assert mock_service.lookup_addresses.await_count == 2
 
 
 async def test_invalid_query_shows_error(hass: HomeAssistant) -> None:

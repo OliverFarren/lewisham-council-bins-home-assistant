@@ -4,14 +4,15 @@ from __future__ import annotations
 
 import logging
 import re
-from datetime import date
+from datetime import date, datetime
 
 import homeassistant.util.dt as dt_util
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.event import async_track_time_change
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from lewisham_client import CollectionEntry
 
@@ -87,6 +88,24 @@ class LewishamCollectionSensor(CoordinatorEntity[LewishamUpdateCoordinator], Sen
             name=coordinator.address,
             manufacturer=MANUFACTURER,
         )
+
+    async def async_added_to_hass(self) -> None:
+        """Subscribe to local midnight updates for relative date attributes."""
+        await super().async_added_to_hass()
+        self.async_on_remove(
+            async_track_time_change(
+                self.hass,
+                self._async_handle_midnight,
+                hour=0,
+                minute=0,
+                second=0,
+            )
+        )
+
+    @callback
+    def _async_handle_midnight(self, _now: datetime) -> None:
+        """Refresh relative date attributes without fetching council data."""
+        self.async_write_ha_state()
 
     def _current_entry(self) -> CollectionEntry | None:
         """Return this sensor's entry from the latest coordinator data, or None."""

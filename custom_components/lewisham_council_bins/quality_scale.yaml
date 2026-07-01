@@ -4,7 +4,7 @@ rules:
     status: exempt
     comment: Integration registers no service actions.
   appropriate-polling: done
-  brands: todo            # requires PR to home-assistant/brands
+  brands: done
   common-modules: done
   config-flow-test-coverage: done
   config-flow: done
@@ -12,9 +12,15 @@ rules:
   docs-actions:
     status: exempt
     comment: No service actions provided.
+  docs-conditions:
+    status: exempt
+    comment: Integration provides no custom conditions.
   docs-high-level-description: done
   docs-installation-instructions: done
   docs-removal-instructions: done
+  docs-triggers:
+    status: exempt
+    comment: Integration provides no custom triggers.
   entity-event-setup: done
   entity-unique-id: done
   has-entity-name: done

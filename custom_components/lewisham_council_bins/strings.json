@@ -6,6 +6,9 @@
         "description": "Enter your postcode or street name to find your property.",
         "data": {
           "query": "Postcode or street name"
+        },
+        "data_description": {
+          "query": "Enter a full Lewisham postcode or part of a street name."
         }
       },
       "select": {
@@ -13,6 +16,9 @@
         "description": "Select your property from the list below.",
         "data": {
           "uprn": "Address"
+        },
+        "data_description": {
+          "uprn": "Choose the address whose collection schedule you want to add."
         }
       }
     },

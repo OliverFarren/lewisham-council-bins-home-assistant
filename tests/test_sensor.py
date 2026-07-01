@@ -10,7 +10,7 @@ import pytest
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
 from custom_components.lewisham_council_bins.const import CONF_ADDRESS, CONF_UPRN, DOMAIN
 
@@ -171,3 +171,32 @@ async def test_days_until_collection_none_when_no_date(
     attrs = hass.states.get(_entity_id(hass, "refuse")).attributes
     assert attrs["days_until_collection"] is None
     assert attrs["collection_in"] is None
+
+
+async def test_relative_timing_refreshes_at_midnight_without_polling(
+    hass: HomeAssistant, loaded_entry: MockConfigEntry
+) -> None:
+    """Relative attributes should roll over at midnight without an HTTP refresh."""
+    coordinator = loaded_entry.runtime_data
+    get_schedule = coordinator.service.get_collection_schedule
+    coordinator.update_interval = None
+    coordinator._async_unsub_refresh()
+    calls_before_midnight = get_schedule.await_count
+
+    before_midnight = datetime(2026, 7, 6, 12, 0, tzinfo=dt_util.UTC)
+    with patch("homeassistant.util.dt.now", return_value=before_midnight):
+        coordinator.async_update_listeners()
+        await hass.async_block_till_done()
+
+    state = hass.states.get(_entity_id(hass, "food_waste"))
+    assert state.attributes["collection_in"] == "tomorrow"
+
+    midnight = datetime(2026, 7, 7, 0, 0, tzinfo=dt_util.UTC)
+    with patch("homeassistant.util.dt.now", return_value=midnight):
+        async_fire_time_changed(hass, midnight)
+        await hass.async_block_till_done()
+
+    state = hass.states.get(_entity_id(hass, "food_waste"))
+    assert state.attributes["days_until_collection"] == 0
+    assert state.attributes["collection_in"] == "today"
+    assert get_schedule.await_count == calls_before_midnight
