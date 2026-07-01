@@ -1,0 +1,84 @@
+rules:
+  # Bronze
+  action-setup:
+    status: exempt
+    comment: Integration registers no service actions.
+  appropriate-polling: done
+  brands: todo            # requires PR to home-assistant/brands
+  common-modules: done
+  config-flow-test-coverage: todo   # verify 100% flow coverage
+  config-flow: done
+  dependency-transparency: todo     # confirm client is public + licensed on PyPI
+  docs-actions:
+    status: exempt
+    comment: No service actions provided.
+  docs-high-level-description: todo
+  docs-installation-instructions: todo
+  docs-removal-instructions: todo
+  entity-event-setup: done
+  entity-unique-id: done
+  has-entity-name: done
+  runtime-data: done
+  test-before-configure: done
+  test-before-setup: done
+  unique-config-entry: done
+
+  # Silver
+  action-exceptions:
+    status: exempt
+    comment: No service actions provided.
+  config-entry-unloading: done
+  docs-configuration-parameters:
+    status: exempt
+    comment: No configuration options are offered post-setup.
+  docs-installation-parameters: todo
+  entity-unavailable: done
+  integration-owner: done
+  log-when-unavailable: done
+  parallel-updates: todo
+  reauthentication-flow:
+    status: exempt
+    comment: Data source is public; no authentication is required.
+  test-coverage: todo
+
+  # Gold
+  devices: done
+  diagnostics: todo
+  discovery:
+    status: exempt
+    comment: A council web service cannot be network-discovered.
+  discovery-update-info:
+    status: exempt
+    comment: No discovered network devices to update.
+  docs-data-update: todo
+  docs-examples: todo
+  docs-known-limitations: todo
+  docs-supported-devices:
+    status: exempt
+    comment: Integration exposes a service, not physical devices.
+  docs-supported-functions: todo
+  docs-troubleshooting: todo
+  docs-use-cases: todo
+  dynamic-devices:
+    status: exempt
+    comment: One device per address (config entry); no sub-devices appear at runtime.
+  entity-category: done
+  entity-device-class: done
+  entity-disabled-by-default:
+    status: exempt
+    comment: All entities are primary and useful; none are noisy.
+  entity-translations: todo
+  exception-translations: todo
+  icon-translations: todo
+  reconfiguration-flow: todo
+  repair-issues:
+    status: exempt
+    comment: No user-actionable repair conditions at present.
+  stale-devices:
+    status: exempt
+    comment: Device lifecycle is tied 1:1 to the config entry.
+
+  # Platinum
+  async-dependency: done
+  inject-websession: done
+  strict-typing: todo     # confirm client ships py.typed
