@@ -62,8 +62,6 @@ class LewishamUpdateCoordinator(DataUpdateCoordinator[CollectionSchedule]):
         except UpstreamUnavailableError as err:
             raise _update_failed("schedule_unavailable", error=str(err)) from err
         except (CollectionScheduleNotFoundError, AddressNotFoundError) as err:
-            raise _update_failed(
-                "schedule_not_found", uprn=self.uprn, error=str(err)
-            ) from err
+            raise _update_failed("schedule_not_found", uprn=self.uprn, error=str(err)) from err
         except DomainError as err:
             raise _update_failed("schedule_unexpected_error", error=str(err)) from err

@@ -348,11 +348,13 @@ text and logs.
 ## Development
 
 ```bash
-uv sync --group dev
-uv run pytest -v --cov=custom_components/lewisham_council_bins --cov-branch --cov-report=term-missing
-uv run ruff check .
-uv run mypy custom_components/lewisham_council_bins/
+make setup
+make check
 ```
+
+`make check` runs the same linting, formatting check, type check, tests, and
+coverage threshold as the Python 3.13 CI job. Run `make format` first to
+automatically fix Ruff lint and formatting issues.
 
 ## Licence
 
