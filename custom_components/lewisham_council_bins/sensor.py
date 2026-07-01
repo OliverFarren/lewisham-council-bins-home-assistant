@@ -81,7 +81,7 @@ class LewishamCollectionSensor(CoordinatorEntity[LewishamUpdateCoordinator], Sen
         slug = _slug(collection.waste_type)
         self._attr_unique_id = f"{coordinator.uprn}_{slug}"
         self._attr_name = collection.waste_type
-        self.entity_id = f"sensor.lewisham_council_{slug}"
+        self.entity_id = f"sensor.lewisham_council_bins_{slug}"
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, coordinator.uprn)},
             name=coordinator.address,

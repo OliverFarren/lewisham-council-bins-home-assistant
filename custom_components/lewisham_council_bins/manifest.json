@@ -1,12 +1,12 @@
 {
-  "domain": "lewisham_council",
+  "domain": "lewisham_council_bins",
   "name": "Lewisham Council Bin Collections",
   "codeowners": ["@OliverFarren"],
   "config_flow": true,
-  "documentation": "https://github.com/OliverFarren/lewisham-council-home-assistant",
+  "documentation": "https://github.com/OliverFarren/lewisham-council-bins-home-assistant",
   "integration_type": "service",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/OliverFarren/lewisham-council-home-assistant/issues",
+  "issue_tracker": "https://github.com/OliverFarren/lewisham-council-bins-home-assistant/issues",
   "requirements": ["lewisham-council-client==0.1.0"],
   "version": "0.2.0"
 }

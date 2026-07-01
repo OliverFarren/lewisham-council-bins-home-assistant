@@ -11,7 +11,7 @@ from homeassistant.data_entry_flow import FlowResultType
 from lewisham_client import UpstreamUnavailableError
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.lewisham_council.const import CONF_ADDRESS, CONF_UPRN, DOMAIN
+from custom_components.lewisham_council_bins.const import CONF_ADDRESS, CONF_UPRN, DOMAIN
 
 from .conftest import MOCK_ADDRESS, MOCK_CANDIDATES, MOCK_UPRN
 
@@ -27,7 +27,7 @@ def _mock_service(candidates: list = MOCK_CANDIDATES) -> AsyncMock:
 def _mock_httpx() -> Generator[None]:
     """Patch get_async_client so the config flow never touches real HTTP."""
     with patch(
-        "custom_components.lewisham_council.config_flow.get_async_client",
+        "custom_components.lewisham_council_bins.config_flow.get_async_client",
         return_value=MagicMock(),
     ):
         yield
@@ -44,9 +44,9 @@ async def test_valid_postcode_advances_to_select(hass: HomeAssistant) -> None:
     """A postcode that resolves addresses progresses to the address-selection step."""
     mock_service = _mock_service()
     with (
-        patch("custom_components.lewisham_council.config_flow.LewishamClient"),
+        patch("custom_components.lewisham_council_bins.config_flow.LewishamClient"),
         patch(
-            "custom_components.lewisham_council.config_flow.LewishamService",
+            "custom_components.lewisham_council_bins.config_flow.LewishamService",
             return_value=mock_service,
         ),
     ):
@@ -64,9 +64,9 @@ async def test_selecting_address_creates_entry(hass: HomeAssistant) -> None:
     """Confirming an address creates a config entry with UPRN as the unique id."""
     mock_service = _mock_service()
     with (
-        patch("custom_components.lewisham_council.config_flow.LewishamClient"),
+        patch("custom_components.lewisham_council_bins.config_flow.LewishamClient"),
         patch(
-            "custom_components.lewisham_council.config_flow.LewishamService",
+            "custom_components.lewisham_council_bins.config_flow.LewishamService",
             return_value=mock_service,
         ),
     ):
@@ -87,9 +87,9 @@ async def test_no_addresses_found_shows_error(hass: HomeAssistant) -> None:
     """An empty result from the address search shows a no_addresses_found error."""
     mock_service = _mock_service(candidates=[])
     with (
-        patch("custom_components.lewisham_council.config_flow.LewishamClient"),
+        patch("custom_components.lewisham_council_bins.config_flow.LewishamClient"),
         patch(
-            "custom_components.lewisham_council.config_flow.LewishamService",
+            "custom_components.lewisham_council_bins.config_flow.LewishamService",
             return_value=mock_service,
         ),
     ):
@@ -108,9 +108,9 @@ async def test_upstream_unavailable_shows_cannot_connect(hass: HomeAssistant) ->
     mock_service = AsyncMock()
     mock_service.lookup_addresses.side_effect = UpstreamUnavailableError("timeout")
     with (
-        patch("custom_components.lewisham_council.config_flow.LewishamClient"),
+        patch("custom_components.lewisham_council_bins.config_flow.LewishamClient"),
         patch(
-            "custom_components.lewisham_council.config_flow.LewishamService",
+            "custom_components.lewisham_council_bins.config_flow.LewishamService",
             return_value=mock_service,
         ),
     ):
@@ -134,9 +134,9 @@ async def test_duplicate_uprn_aborts(hass: HomeAssistant) -> None:
 
     mock_service = _mock_service()
     with (
-        patch("custom_components.lewisham_council.config_flow.LewishamClient"),
+        patch("custom_components.lewisham_council_bins.config_flow.LewishamClient"),
         patch(
-            "custom_components.lewisham_council.config_flow.LewishamService",
+            "custom_components.lewisham_council_bins.config_flow.LewishamService",
             return_value=mock_service,
         ),
     ):

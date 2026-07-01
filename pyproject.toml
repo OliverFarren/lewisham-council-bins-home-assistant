@@ -1,5 +1,5 @@
 [project]
-name = "lewisham-council-home-assistant"
+name = "lewisham-council-bins-home-assistant"
 version = "0.1.0"
 description = "Home Assistant custom integration for Lewisham Council bin collections"
 requires-python = ">=3.13"
@@ -19,7 +19,7 @@ dev = [
 asyncio_mode = "auto"
 testpaths = ["tests"]
 # Ensure the project root is on sys.path so HA's custom-component namespace
-# package discovery can find custom_components/lewisham_council/.
+# package discovery can find custom_components/lewisham_council_bins/.
 pythonpath = ["."]
 
 [tool.ruff]

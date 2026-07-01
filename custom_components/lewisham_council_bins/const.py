@@ -2,7 +2,7 @@
 
 from datetime import timedelta
 
-DOMAIN = "lewisham_council"
+DOMAIN = "lewisham_council_bins"
 
 CONF_UPRN = "uprn"
 CONF_ADDRESS = "address"

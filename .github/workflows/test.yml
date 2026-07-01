@@ -28,7 +28,7 @@ jobs:
           uv run ruff format --check .
 
       - name: Type check
-        run: uv run mypy custom_components/lewisham_council/
+        run: uv run mypy custom_components/lewisham_council_bins/
 
       - name: Test
         run: uv run pytest -v

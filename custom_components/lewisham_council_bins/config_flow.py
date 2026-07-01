@@ -25,7 +25,7 @@ _LOGGER = logging.getLogger(__name__)
 STEP_USER_SCHEMA = vol.Schema({vol.Required("query"): str})
 
 
-class LewishamCouncilConfigFlow(ConfigFlow, domain=DOMAIN):
+class LewishamCouncilBinsConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for the Lewisham Council integration.
 
     Step 1 (user): enter a postcode or street name and resolve a candidate list.

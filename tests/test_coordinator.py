@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import UpdateFailed
 from lewisham_client import CollectionScheduleNotFoundError, UpstreamUnavailableError
 
-from custom_components.lewisham_council.coordinator import LewishamUpdateCoordinator
+from custom_components.lewisham_council_bins.coordinator import LewishamUpdateCoordinator
 
 from .conftest import MOCK_ADDRESS, MOCK_SCHEDULE, MOCK_UPRN
 

@@ -1,6 +1,6 @@
 <p align="center">
   <img
-    src="custom_components/lewisham_council/brand/icon.png"
+    src="custom_components/lewisham_council_bins/brand/icon.png"
     alt="Lewisham Council Bin Collections"
     width="96"
   />
@@ -21,7 +21,7 @@ schedule sensors for Lewisham addresses to Home Assistant.
 - Attributes on each sensor: `frequency`, `day`, `next_collection_basis`,
   `days_until_collection` (integer), and `collection_in` (e.g. `"today"`,
   `"tomorrow"`, `"4 days"`).
-- Clean entity IDs: `sensor.lewisham_council_food_waste` etc. — not tied to the
+- Clean entity IDs: `sensor.lewisham_council_bins_food_waste` etc. — not tied to the
   address string.
 - A single device per address, grouped in the HA device registry.
 - Automatic polling every 12 hours via HA's shared coordinator pattern.
@@ -36,7 +36,7 @@ schedule sensors for Lewisham addresses to Home Assistant.
 
 ## Manual installation
 
-Copy `custom_components/lewisham_council/` into your HA `custom_components/`
+Copy `custom_components/lewisham_council_bins/` into your HA `custom_components/`
 directory and restart Home Assistant.
 
 ## Requirements
@@ -51,7 +51,7 @@ directory and restart Home Assistant.
 uv sync --group dev
 uv run pytest -v
 uv run ruff check .
-uv run mypy custom_components/lewisham_council/
+uv run mypy custom_components/lewisham_council_bins/
 ```
 
 ## Licence

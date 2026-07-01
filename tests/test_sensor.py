@@ -12,7 +12,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.lewisham_council.const import CONF_ADDRESS, CONF_UPRN, DOMAIN
+from custom_components.lewisham_council_bins.const import CONF_ADDRESS, CONF_UPRN, DOMAIN
 
 from .conftest import MOCK_ADDRESS, MOCK_SCHEDULE, MOCK_UPRN
 
@@ -32,12 +32,12 @@ async def loaded_entry(hass: HomeAssistant) -> MockConfigEntry:
 
     with (
         patch(
-            "custom_components.lewisham_council.get_async_client",
+            "custom_components.lewisham_council_bins.get_async_client",
             return_value=MagicMock(),
         ),
-        patch("custom_components.lewisham_council.LewishamClient"),
+        patch("custom_components.lewisham_council_bins.LewishamClient"),
         patch(
-            "custom_components.lewisham_council.LewishamService",
+            "custom_components.lewisham_council_bins.LewishamService",
             return_value=mock_service,
         ),
     ):
@@ -102,13 +102,13 @@ async def test_sensor_device_class_is_date(
     assert state.attributes.get("device_class") == SensorDeviceClass.DATE
 
 
-async def test_entity_id_uses_lewisham_council_prefix(
+async def test_entity_id_uses_lewisham_council_bins_prefix(
     hass: HomeAssistant, loaded_entry: MockConfigEntry
 ) -> None:
-    """Entity IDs use the lewisham_council_ prefix, not the address."""
-    assert _entity_id(hass, "food_waste") == "sensor.lewisham_council_food_waste"
-    assert _entity_id(hass, "recycling") == "sensor.lewisham_council_recycling"
-    assert _entity_id(hass, "refuse") == "sensor.lewisham_council_refuse"
+    """Entity IDs use the lewisham_council_bins_ prefix, not the address."""
+    assert _entity_id(hass, "food_waste") == "sensor.lewisham_council_bins_food_waste"
+    assert _entity_id(hass, "recycling") == "sensor.lewisham_council_bins_recycling"
+    assert _entity_id(hass, "refuse") == "sensor.lewisham_council_bins_refuse"
 
 
 async def test_unique_id_is_uprn_and_waste_type(
