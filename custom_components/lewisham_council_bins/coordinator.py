@@ -6,7 +6,10 @@ import logging
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.helpers.update_coordinator import (
+    TimestampDataUpdateCoordinator,
+    UpdateFailed,
+)
 from lewisham_client import (
     AddressNotFoundError,
     CollectionSchedule,
@@ -30,13 +33,14 @@ def _update_failed(translation_key: str, **placeholders: str) -> UpdateFailed:
     )
 
 
-class LewishamUpdateCoordinator(DataUpdateCoordinator[CollectionSchedule]):
+class LewishamUpdateCoordinator(TimestampDataUpdateCoordinator[CollectionSchedule]):
     """Coordinator that fetches and caches the collection schedule for one address.
 
     One coordinator instance is created per config entry (i.e. per UPRN). HA's
     DataUpdateCoordinator owns the 12-hour refresh interval; the client's own
     schedule cache is disabled so the coordinator is the single source of truth
-    for refresh timing.
+    for refresh timing. TimestampDataUpdateCoordinator adds last_update_success_time,
+    which diagnostics.py reports.
     """
 
     def __init__(

@@ -14,7 +14,7 @@ from datetime import timedelta
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.httpx_client import get_async_client
-from lewisham_client import LewishamClient, LewishamService
+from lewisham_client import LewishamClient, LewishamParser, LewishamService
 
 from .const import CONF_ADDRESS, CONF_UPRN
 from .coordinator import LewishamCouncilBinsConfigEntry, LewishamUpdateCoordinator
@@ -33,8 +33,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: LewishamCouncilBinsConfi
     address: str = entry.data[CONF_ADDRESS]
 
     client = LewishamClient(http_client=get_async_client(hass))
+    # include_raw_upstream lets a parser contract-drift failure attach a
+    # truncated payload preview to its diagnostics attribute (see
+    # diagnostics.py), which is scrubbed of the UPRN/address before it ever
+    # reaches a downloadable diagnostics file. Logging is unaffected: the
+    # preview is only ever logged when the parser's own logger is at DEBUG.
     service = LewishamService(
         client=client,
+        parser=LewishamParser(include_raw_upstream=True),
         schedule_cache_ttl=timedelta(0),
         negative_cache_ttl=timedelta(0),
     )

@@ -11,7 +11,7 @@ dependencies = []
 # Mirrors manifest.json's "requirements" so the local venv has what the
 # integration itself imports at runtime. Keep this in sync with manifest.json.
 runtime = [
-    "lewisham-council-client==0.1.0",
+    "lewisham-council-client==0.2.0",
 ]
 dev = [
     { include-group = "runtime" },
