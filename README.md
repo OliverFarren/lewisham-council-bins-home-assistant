@@ -11,8 +11,11 @@
 [![Test](https://github.com/OliverFarren/lewisham-council-bins-home-assistant/actions/workflows/test.yml/badge.svg)](https://github.com/OliverFarren/lewisham-council-bins-home-assistant/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/OliverFarren/lewisham-council-bins-home-assistant/branch/main/graph/badge.svg)](https://codecov.io/gh/OliverFarren/lewisham-council-bins-home-assistant)
 
-A [HACS](https://hacs.xyz) custom integration that adds waste collection
-schedule sensors for Lewisham addresses to Home Assistant.
+A [HACS](https://hacs.xyz) custom integration that retrieves household waste
+collection schedules from [Lewisham Council's bin collection
+service](https://lewisham.gov.uk/myservices/recycling-and-rubbish/your-bins/collection)
+and adds them to Home Assistant. It is intended for residential addresses in
+the London Borough of Lewisham.
 
 ## What it provides
 
@@ -29,24 +32,49 @@ schedule sensors for Lewisham addresses to Home Assistant.
 - A single device per address, grouped in the HA device registry.
 - Automatic polling every 12 hours via HA's shared coordinator pattern.
 
-## Installation via HACS
+## Prerequisites
 
-1. Add this repository as a custom repository in HACS (category: Integration).
-2. Install **Lewisham Council Bin Collections**.
-3. Restart Home Assistant.
-4. Go to **Settings → Devices & Services → Add integration** and search for
-   *Lewisham Council Bin Collections*.
+- Home Assistant 2024.6 or newer.
+- For the recommended installation method, a working
+  [HACS](https://www.hacs.xyz/docs/use/) installation.
 
-## Manual installation
+## Installation
 
-Copy `custom_components/lewisham_council_bins/` into your HA `custom_components/`
-directory and restart Home Assistant.
+### HACS (recommended)
 
-## Requirements
+1. In HACS, open the three-dot menu and select **Custom repositories**.
+2. Enter
+   `https://github.com/OliverFarren/lewisham-council-bins-home-assistant`,
+   select **Integration** as the category, and select **Add**.
+3. Find **Lewisham Council Bin Collections** in HACS and select **Download**.
+4. Restart Home Assistant.
+5. Go to **Settings → Devices & services** and select **Add integration**.
+6. Search for and select **Lewisham Council Bin Collections**.
+7. Enter a Lewisham postcode or street, select the matching address, and
+   complete the setup.
 
-- Home Assistant ≥ 2024.6
-- `lewisham-council-client==0.1.0` (installed automatically by HA from
-  `manifest.json`)
+### Manual installation
+
+1. Copy `custom_components/lewisham_council_bins/` from this repository into
+   the `custom_components/` directory in your Home Assistant configuration
+   directory.
+2. Restart Home Assistant.
+3. Go to **Settings → Devices & services** and select **Add integration**.
+4. Search for and select **Lewisham Council Bin Collections**.
+5. Enter a Lewisham postcode or street, select the matching address, and
+   complete the setup.
+
+## Removal
+
+1. Go to **Settings → Devices & services** and select
+   **Lewisham Council Bin Collections**.
+2. Open the three-dot menu for the address you want to remove and select
+   **Delete**.
+3. To uninstall the custom integration as well, remove it through HACS. For a
+   manual installation, delete the
+   `custom_components/lewisham_council_bins/` directory instead.
+4. Restart Home Assistant after uninstalling the custom integration files.
+
 
 ## Development
 
