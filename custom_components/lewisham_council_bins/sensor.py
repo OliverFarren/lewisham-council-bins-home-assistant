@@ -8,7 +8,6 @@ from datetime import date, datetime
 
 import homeassistant.util.dt as dt_util
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -17,7 +16,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from lewisham_client import CollectionEntry
 
 from .const import DOMAIN, MANUFACTURER
-from .coordinator import LewishamUpdateCoordinator
+from .coordinator import LewishamCouncilBinsConfigEntry, LewishamUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -76,7 +75,7 @@ def _collection_in(days: int | None) -> str | None:
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    entry: LewishamCouncilBinsConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up Lewisham Council sensors from a config entry.
@@ -85,7 +84,7 @@ async def async_setup_entry(
     refresh. If Lewisham adds or renames streams in future, re-loading the
     config entry will pick up the change.
     """
-    coordinator: LewishamUpdateCoordinator = entry.runtime_data
+    coordinator = entry.runtime_data
     async_add_entities(
         LewishamCollectionSensor(coordinator, collection)
         for collection in coordinator.data.collections

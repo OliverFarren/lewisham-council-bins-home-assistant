@@ -87,4 +87,4 @@ rules:
   # Platinum
   async-dependency: done
   inject-websession: done
-  strict-typing: todo     # confirm client ships py.typed
+  strict-typing: done

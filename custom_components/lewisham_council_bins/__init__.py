@@ -11,19 +11,18 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.httpx_client import get_async_client
 from lewisham_client import LewishamClient, LewishamService
 
 from .const import CONF_ADDRESS, CONF_UPRN
-from .coordinator import LewishamUpdateCoordinator
+from .coordinator import LewishamCouncilBinsConfigEntry, LewishamUpdateCoordinator
 
 PLATFORMS: list[Platform] = [Platform.SENSOR]
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: LewishamCouncilBinsConfigEntry) -> bool:
     """Set up Lewisham Council from a config entry.
 
     Injects HA's managed httpx session into the client so the integration
@@ -48,6 +47,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: LewishamCouncilBinsConfigEntry) -> bool:
     """Unload a Lewisham Council config entry."""
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from lewisham_client import (
@@ -65,3 +66,6 @@ class LewishamUpdateCoordinator(DataUpdateCoordinator[CollectionSchedule]):
             raise _update_failed("schedule_not_found", uprn=self.uprn, error=str(err)) from err
         except DomainError as err:
             raise _update_failed("schedule_unexpected_error", error=str(err)) from err
+
+
+type LewishamCouncilBinsConfigEntry = ConfigEntry[LewishamUpdateCoordinator]
