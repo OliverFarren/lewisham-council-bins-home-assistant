@@ -76,7 +76,13 @@ rules:
   entity-translations: done
   exception-translations: done
   icon-translations: done
-  reconfiguration-flow: todo
+  reconfiguration-flow:
+    status: exempt
+    comment: >-
+      Each configured address is a separate config entry identified by its
+      UPRN, from which its device and entity unique IDs derive. The integration
+      has no mutable settings; users manage addresses by adding or removing
+      config entries.
   repair-issues:
     status: exempt
     comment: No user-actionable repair conditions at present.
