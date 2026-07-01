@@ -21,6 +21,9 @@ from .coordinator import LewishamUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
+# All sensors share a coordinator and do not make individual update requests.
+PARALLEL_UPDATES = 0
+
 
 def _slug(waste_type: str) -> str:
     """Convert a waste-type string (e.g. 'Food Waste') to a stable lowercase slug."""

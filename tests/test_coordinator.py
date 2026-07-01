@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock
 import pytest
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import UpdateFailed
-from lewisham_client import CollectionScheduleNotFoundError, UpstreamUnavailableError
+from lewisham_client import CollectionScheduleNotFoundError, DomainError, UpstreamUnavailableError
 
 from custom_components.lewisham_council_bins.coordinator import LewishamUpdateCoordinator
 
@@ -45,4 +45,14 @@ async def test_schedule_not_found_raises_update_failed(hass: HomeAssistant) -> N
 
     coordinator = LewishamUpdateCoordinator(hass, mock_service, MOCK_UPRN, MOCK_ADDRESS)
     with pytest.raises(UpdateFailed, match="No collection schedule"):
+        await coordinator._async_update_data()
+
+
+async def test_unexpected_domain_error_raises_update_failed(hass: HomeAssistant) -> None:
+    """Other client domain errors are re-raised as UpdateFailed."""
+    mock_service = AsyncMock()
+    mock_service.get_collection_schedule.side_effect = DomainError("unexpected response")
+
+    coordinator = LewishamUpdateCoordinator(hass, mock_service, MOCK_UPRN, MOCK_ADDRESS)
+    with pytest.raises(UpdateFailed, match="Unexpected error"):
         await coordinator._async_update_data()

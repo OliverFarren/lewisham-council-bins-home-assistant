@@ -13,6 +13,8 @@ from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
 from custom_components.lewisham_council_bins.const import CONF_ADDRESS, CONF_UPRN, DOMAIN
+from custom_components.lewisham_council_bins.coordinator import LewishamUpdateCoordinator
+from custom_components.lewisham_council_bins.sensor import LewishamCollectionSensor
 
 from .conftest import MOCK_ADDRESS, MOCK_SCHEDULE, MOCK_UPRN
 
@@ -200,3 +202,18 @@ async def test_relative_timing_refreshes_at_midnight_without_polling(
     assert state.attributes["days_until_collection"] == 0
     assert state.attributes["collection_in"] == "today"
     assert get_schedule.await_count == calls_before_midnight
+
+
+def test_sensor_without_coordinator_data_is_unavailable(hass: HomeAssistant) -> None:
+    """A sensor is unavailable and has no value or attributes before data exists."""
+    coordinator = LewishamUpdateCoordinator(
+        hass,
+        AsyncMock(),
+        MOCK_UPRN,
+        MOCK_ADDRESS,
+    )
+    sensor = LewishamCollectionSensor(coordinator, MOCK_SCHEDULE.collections[0])
+
+    assert sensor.native_value is None
+    assert sensor.available is False
+    assert sensor.extra_state_attributes == {}

@@ -47,6 +47,15 @@ may change without notice.
 
 ## Installation
 
+### Setup parameters
+
+- **Postcode or street name**: A full Lewisham postcode or at least three
+  characters from a street name. This is used to search for matching
+  residential addresses.
+- **Address**: The property whose collection schedule you want to add. Select
+  it from the search results; the integration stores its Unique Property
+  Reference Number (UPRN) automatically.
+
 ### HACS (recommended)
 
 1. In HACS, open the three-dot menu and select **Custom repositories**.
@@ -87,7 +96,7 @@ may change without notice.
 
 ```bash
 uv sync --group dev
-uv run pytest -v
+uv run pytest -v --cov=custom_components/lewisham_council_bins --cov-branch --cov-report=term-missing
 uv run ruff check .
 uv run mypy custom_components/lewisham_council_bins/
 ```
