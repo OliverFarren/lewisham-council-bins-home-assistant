@@ -165,7 +165,12 @@ tap_action:
 features_position: bottom
 ```
 
+`collection_in` reads as "today", "tomorrow", or "N days" depending on how
+far off the collection is, so the same card automatically adapts as the date
+approaches:
+
 ![A full-width tile card named "Black bin" showing "tomorrow · Thursday · 2026-07-02"](docs/images/tile-card-refuse.png)
+![The same tile card showing "13 days · Thursday · 2026-07-16" once the next collection is further away](docs/images/tile-card-refuse-2.png)
 
 And a narrower, vertical card for recycling:
 
@@ -188,6 +193,7 @@ features_position: bottom
 ```
 
 ![A narrow, vertical tile card named "Recycling" showing "tomorrow · Thursday"](docs/images/tile-card-recycling.png)
+![The same tile card showing "6 days · Thursday" for a collection further out](docs/images/tile-card-recycling-2.png)
 
 ## Prerequisites
 
