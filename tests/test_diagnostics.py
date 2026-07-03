@@ -13,15 +13,12 @@ from lewisham_client import (
     UpstreamScraperChangedError,
 )
 from pytest_homeassistant_custom_component.common import MockConfigEntry
-from pytest_homeassistant_custom_component.components.diagnostics import (
-    get_diagnostics_for_config_entry,
-    get_diagnostics_for_device,
-)
 from pytest_homeassistant_custom_component.typing import ClientSessionGenerator
 
 from custom_components.lewisham_council_bins.const import CONF_ADDRESS, CONF_UPRN, DOMAIN
 
 from .conftest import MOCK_ADDRESS, MOCK_SCHEDULE, MOCK_UPRN
+from .helpers import get_diagnostics_for_config_entry, get_diagnostics_for_device
 
 
 @pytest.fixture
@@ -123,16 +120,16 @@ async def test_config_entry_diagnostics_surfaces_scrubbed_drift_on_failure(
     assert diagnostics["data"]["collections"][0]["waste_type"] == "Food Waste"
 
 
-async def test_config_entry_diagnostics_scrubs_uprn_from_translated_message(
+async def test_config_entry_diagnostics_scrubs_uprn_from_update_failed_message(
     hass: HomeAssistant,
     hass_client: ClientSessionGenerator,
     loaded_entry: MockConfigEntry,
 ) -> None:
-    """UpdateFailed's translated 'schedule_not_found' message embeds the raw UPRN.
+    """UpdateFailed's 'schedule_not_found' message embeds the raw UPRN.
 
-    coordinator.py passes uprn=self.uprn as a translation placeholder, and
-    strings.json's schedule_not_found message interpolates it verbatim into
-    the exception's str() - regression test for that specific leak path.
+    On modern HA, strings.json interpolates the translation placeholder; on
+    HA before 2024.12, coordinator.py formats the English fallback. This is a
+    regression test for both versions of that leak path.
     """
     coordinator = loaded_entry.runtime_data
     coordinator.service.get_collection_schedule.side_effect = CollectionScheduleNotFoundError(

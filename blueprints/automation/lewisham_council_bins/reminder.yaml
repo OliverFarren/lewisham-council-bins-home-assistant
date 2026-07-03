@@ -39,7 +39,7 @@ variables:
   bin_sensor: !input bin_sensor
 
 trigger:
-  - trigger: time
+  - platform: time
     at: !input reminder_time
 
 condition:

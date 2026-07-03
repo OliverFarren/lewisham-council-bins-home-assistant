@@ -2,7 +2,7 @@
 name = "lewisham-council-bins-home-assistant"
 version = "0.5.1"
 description = "Home Assistant custom integration for Lewisham Council bin collections"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 # Runtime dependencies are declared in manifest.json and installed by HA/HACS.
 # This section is for dev tooling only.
 dependencies = []
@@ -16,9 +16,9 @@ runtime = [
 dev = [
     { include-group = "runtime" },
     # Not a manifest.json requirement: Home Assistant is the host runtime that
-    # loads this integration, never a dependency it declares. Pinned loosely to
-    # the README's stated minimum supported version, for local type-checking
-    # and IDE import resolution only.
+    # loads this integration, never a dependency it declares. This resolves a
+    # recent compatible version for local checks; CI separately tests the exact
+    # minimum supported Home Assistant release.
     "homeassistant>=2024.6",
     "pytest-homeassistant-custom-component",
     "pytest-cov>=6.0",
@@ -34,12 +34,14 @@ testpaths = ["tests"]
 pythonpath = ["."]
 
 [tool.ruff]
-target-version = "py313"
+target-version = "py312"
 line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
 
 [tool.mypy]
+# Current Home Assistant type definitions use Python 3.13 syntax. Runtime
+# compatibility with Python 3.12 is exercised by the minimum-version CI job.
 python_version = "3.13"
 strict = true

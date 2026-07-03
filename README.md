@@ -11,7 +11,6 @@
 [![Test](https://github.com/OliverFarren/lewisham-council-bins-home-assistant/actions/workflows/test.yml/badge.svg)](https://github.com/OliverFarren/lewisham-council-bins-home-assistant/actions/workflows/test.yml)
 [![Validate](https://github.com/OliverFarren/lewisham-council-bins-home-assistant/actions/workflows/validate.yml/badge.svg)](https://github.com/OliverFarren/lewisham-council-bins-home-assistant/actions/workflows/validate.yml)
 [![codecov](https://codecov.io/gh/OliverFarren/lewisham-council-bins-home-assistant/branch/main/graph/badge.svg)](https://codecov.io/gh/OliverFarren/lewisham-council-bins-home-assistant)
-[![Python](https://img.shields.io/badge/Python-3.13%20%7C%203.14-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Latest release](https://img.shields.io/github/v/release/OliverFarren/lewisham-council-bins-home-assistant)](https://github.com/OliverFarren/lewisham-council-bins-home-assistant/releases/latest)
 
 A [HACS](https://hacs.xyz) custom integration that retrieves household waste
@@ -214,15 +213,25 @@ features_position: bottom
 
 ### HACS (recommended)
 
+Use this button to add or open the repository in HACS, then select
+**Download**:
+
+[![Open your Home Assistant instance and open this repository in the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=OliverFarren&repository=lewisham-council-bins-home-assistant&category=integration)
+
+Alternatively, add it manually:
+
 1. In HACS, open the three-dot menu and select **Custom repositories**.
 2. Enter
    `https://github.com/OliverFarren/lewisham-council-bins-home-assistant`,
    select **Integration** as the category, and select **Add**.
 3. Find **Lewisham Council Bin Collections** in HACS and select **Download**.
-4. Restart Home Assistant.
-5. Go to **Settings → Devices & services** and select **Add integration**.
-6. Search for and select **Lewisham Council Bin Collections**.
-7. Enter a Lewisham postcode or street, select the matching address, and
+
+After downloading:
+
+1. Restart Home Assistant.
+2. Go to **Settings → Devices & services** and select **Add integration**.
+3. Search for and select **Lewisham Council Bin Collections**.
+4. Enter a Lewisham postcode or street, select the matching address, and
    complete the setup.
 
 ### Manual installation

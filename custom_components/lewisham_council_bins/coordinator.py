@@ -23,14 +23,27 @@ from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
+# Keep these English fallbacks in sync with strings.json. Home Assistant before
+# 2024.12 cannot construct a translated UpdateFailed.
+_UPDATE_FAILED_FALLBACKS = {
+    "schedule_unavailable": "Lewisham Council service unavailable: {error}",
+    "schedule_not_found": "No collection schedule found for UPRN {uprn}: {error}",
+    "schedule_unexpected_error": "Unexpected error fetching collection schedule: {error}",
+}
+
 
 def _update_failed(translation_key: str, **placeholders: str) -> UpdateFailed:
-    """Build an UpdateFailed with this integration's translation domain."""
-    return UpdateFailed(
-        translation_domain=DOMAIN,
-        translation_key=translation_key,
-        translation_placeholders=placeholders,
-    )
+    """Build a translated UpdateFailed, with a fallback for HA before 2024.12."""
+    try:
+        return UpdateFailed(
+            translation_domain=DOMAIN,
+            translation_key=translation_key,
+            translation_placeholders=placeholders,
+        )
+    except TypeError:
+        # UpdateFailed was a plain Exception until HA 2024.12 and therefore
+        # rejected the translation keyword arguments.
+        return UpdateFailed(_UPDATE_FAILED_FALLBACKS[translation_key].format(**placeholders))
 
 
 class LewishamUpdateCoordinator(TimestampDataUpdateCoordinator[CollectionSchedule]):

@@ -27,24 +27,27 @@ async def test_successful_refresh_stores_schedule(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.parametrize(
-    ("side_effect", "expected_key", "expected_placeholders"),
+    ("side_effect", "expected_key", "expected_placeholders", "expected_message"),
     [
         pytest.param(
             UpstreamUnavailableError("timeout"),
             "schedule_unavailable",
             {"error": "timeout"},
+            "Lewisham Council service unavailable: timeout",
             id="upstream_unavailable",
         ),
         pytest.param(
             CollectionScheduleNotFoundError("no schedule for uprn"),
             "schedule_not_found",
             {"uprn": MOCK_UPRN, "error": "no schedule for uprn"},
+            f"No collection schedule found for UPRN {MOCK_UPRN}: no schedule for uprn",
             id="schedule_not_found",
         ),
         pytest.param(
             DomainError("unexpected response"),
             "schedule_unexpected_error",
             {"error": "unexpected response"},
+            "Unexpected error fetching collection schedule: unexpected response",
             id="unexpected_domain_error",
         ),
     ],
@@ -54,8 +57,9 @@ async def test_client_errors_raise_translated_update_failed(
     side_effect: Exception,
     expected_key: str,
     expected_placeholders: dict[str, str],
+    expected_message: str,
 ) -> None:
-    """Each client-library error is re-raised as a correspondingly translated UpdateFailed."""
+    """Client errors use translated UpdateFailed metadata or the pre-2024.12 fallback."""
     mock_service = AsyncMock()
     mock_service.get_collection_schedule.side_effect = side_effect
 
@@ -63,5 +67,8 @@ async def test_client_errors_raise_translated_update_failed(
     with pytest.raises(UpdateFailed) as exc_info:
         await coordinator._async_update_data()
 
-    assert exc_info.value.translation_key == expected_key
-    assert exc_info.value.translation_placeholders == expected_placeholders
+    if hasattr(exc_info.value, "translation_key"):
+        assert exc_info.value.translation_key == expected_key
+        assert exc_info.value.translation_placeholders == expected_placeholders
+    else:
+        assert str(exc_info.value) == expected_message

@@ -6,6 +6,38 @@ on:
   pull_request:
 
 jobs:
+  minimum-home-assistant:
+    name: Test (Home Assistant 2024.6.0 / Python 3.12)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+
+      - name: Create minimum-version environment
+        run: |
+          uv venv --python 3.12 .venv-min
+          # acme 2.10 allows josepy 2.x, but that later release removed an API
+          # Home Assistant 2024.6 imports. Pin the last compatible major here.
+          uv pip install --python .venv-min/bin/python \
+            lewisham-council-client==0.2.0 \
+            pytest-homeassistant-custom-component==0.13.132 \
+            josepy==1.14.0
+
+      - name: Verify Home Assistant version
+        run: |
+          .venv-min/bin/python -c \
+            "from homeassistant.const import __version__; assert __version__ == '2024.6.0', __version__"
+
+      - name: Test minimum supported version
+        run: |
+          .venv-min/bin/pytest -v \
+            --cov=custom_components/lewisham_council_bins \
+            --cov-branch \
+            --cov-fail-under=96
+
   test:
     name: Test (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
