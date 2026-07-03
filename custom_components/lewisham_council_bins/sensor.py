@@ -90,6 +90,28 @@ async def async_setup_entry(
         for collection in coordinator.data.collections
     )
 
+    @callback
+    def _handle_midnight(_now: datetime) -> None:
+        """Refresh stale coordinator data or update relative attributes locally."""
+        today = dt_util.now().date()
+        if any(
+            collection.next_collection is not None and collection.next_collection < today
+            for collection in coordinator.data.collections
+        ):
+            entry.async_create_task(hass, coordinator.async_request_refresh())
+            return
+        coordinator.async_update_listeners()
+
+    entry.async_on_unload(
+        async_track_time_change(
+            hass,
+            _handle_midnight,
+            hour=0,
+            minute=0,
+            second=0,
+        )
+    )
+
 
 class LewishamCollectionSensor(CoordinatorEntity[LewishamUpdateCoordinator], SensorEntity):
     """A sensor reporting the next collection date for one waste stream.
@@ -119,24 +141,6 @@ class LewishamCollectionSensor(CoordinatorEntity[LewishamUpdateCoordinator], Sen
             name=coordinator.address,
             manufacturer=MANUFACTURER,
         )
-
-    async def async_added_to_hass(self) -> None:
-        """Subscribe to local midnight updates for relative date attributes."""
-        await super().async_added_to_hass()
-        self.async_on_remove(
-            async_track_time_change(
-                self.hass,
-                self._async_handle_midnight,
-                hour=0,
-                minute=0,
-                second=0,
-            )
-        )
-
-    @callback
-    def _async_handle_midnight(self, _now: datetime) -> None:
-        """Refresh relative date attributes without fetching council data."""
-        self.async_write_ha_state()
 
     def _current_entry(self) -> CollectionEntry | None:
         """Return this sensor's entry from the latest coordinator data, or None."""
