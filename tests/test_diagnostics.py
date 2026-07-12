@@ -133,11 +133,7 @@ async def test_config_entry_diagnostics_scrubs_address_html_whitespace_variants(
     string match misses those variants and leaks the address.
     """
     coordinator = loaded_entry.runtime_data
-    preview = (
-        "<td>1&nbsp;Test&nbsp;Street</td>\n"
-        "<td>Lewisham</td>\n"
-        "<td>SE13\n      1AA</td>"
-    )
+    preview = "<td>1&nbsp;Test&nbsp;Street</td>\n<td>Lewisham</td>\n<td>SE13\n      1AA</td>"
     drift = ContractDriftDiagnostics(
         error_type="UpstreamScraperChangedError",
         error_message="roundsinformation returned invalid JSON.",
