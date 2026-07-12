@@ -22,7 +22,7 @@ jobs:
           # acme 2.10 allows josepy 2.x, but that later release removed an API
           # Home Assistant 2024.6 imports. Pin the last compatible major here.
           uv pip install --python .venv-min/bin/python \
-            lewisham-council-client==0.2.0 \
+            lewisham-council-client==0.3.0 \
             pytest-homeassistant-custom-component==0.13.132 \
             josepy==1.14.0
 
