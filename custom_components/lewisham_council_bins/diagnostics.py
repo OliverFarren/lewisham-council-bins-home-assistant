@@ -163,12 +163,27 @@ def _address_parts(address: str) -> list[str]:
     return [part.strip() for part in address.split(",") if part.strip()]
 
 
+# payload_preview is raw, undecoded upstream HTML (see LewishamParser
+# _build_drift_diagnostics), so whitespace between the words of an address
+# may appear as literal newlines/indentation or as an HTML entity rather
+# than a single space. Joining each secret's words with this instead of a
+# literal space lets scrubbing survive that without decoding the preview
+# itself, which would misrepresent the raw payload a maintainer is trying to
+# inspect.
+_FLEXIBLE_WHITESPACE = r"(?:\s|&nbsp;|&#0*160;|&#x0*[aA]0;)+"
+
+
+def _secret_pattern(secret: str) -> re.Pattern[str]:
+    words = [re.escape(word) for word in secret.split()]
+    return re.compile(_FLEXIBLE_WHITESPACE.join(words), re.IGNORECASE)
+
+
 def _scrub_secrets(text: str, secrets: list[str]) -> str:
     scrubbed = text
     for secret in secrets:
         if not secret:
             continue
-        scrubbed = re.sub(re.escape(secret), "**REDACTED**", scrubbed, flags=re.IGNORECASE)
+        scrubbed = _secret_pattern(secret).sub("**REDACTED**", scrubbed)
     return scrubbed
 
 

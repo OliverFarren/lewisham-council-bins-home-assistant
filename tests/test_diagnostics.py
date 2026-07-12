@@ -120,6 +120,48 @@ async def test_config_entry_diagnostics_surfaces_scrubbed_drift_on_failure(
     assert diagnostics["data"]["collections"][0]["waste_type"] == "Food Waste"
 
 
+async def test_config_entry_diagnostics_scrubs_address_html_whitespace_variants(
+    hass: HomeAssistant,
+    hass_client: ClientSessionGenerator,
+    loaded_entry: MockConfigEntry,
+) -> None:
+    """Scrubbing must survive the raw HTML formatting a contract-drift preview can contain.
+
+    payload_preview is undecoded upstream HTML, so an address can appear
+    with &nbsp; entities or pretty-printed whitespace between words instead
+    of the single spaces stored in config entry data. A purely literal
+    string match misses those variants and leaks the address.
+    """
+    coordinator = loaded_entry.runtime_data
+    preview = (
+        "<td>1&nbsp;Test&nbsp;Street</td>\n"
+        "<td>Lewisham</td>\n"
+        "<td>SE13\n      1AA</td>"
+    )
+    drift = ContractDriftDiagnostics(
+        error_type="UpstreamScraperChangedError",
+        error_message="roundsinformation returned invalid JSON.",
+        source="parser",
+        payload_size_bytes=len(preview.encode("utf-8")),
+        payload_sha256="deadbeef",
+        payload_preview=preview,
+        payload_truncated=False,
+    )
+    coordinator.service.get_collection_schedule.side_effect = UpstreamScraperChangedError(
+        "roundsinformation returned invalid JSON.", diagnostics=drift
+    )
+
+    await coordinator.async_refresh()
+
+    diagnostics = await get_diagnostics_for_config_entry(hass, hass_client, loaded_entry)
+
+    upstream_preview = diagnostics["upstream_diagnostics"]["payload_preview"]
+    assert "Test" not in upstream_preview
+    assert "Street" not in upstream_preview
+    assert "SE13" not in upstream_preview
+    assert upstream_preview.count("**REDACTED**") == 3
+
+
 async def test_config_entry_diagnostics_scrubs_uprn_from_update_failed_message(
     hass: HomeAssistant,
     hass_client: ClientSessionGenerator,
