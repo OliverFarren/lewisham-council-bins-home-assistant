@@ -180,6 +180,108 @@ async def test_unique_id_is_uprn_and_waste_type(
     assert entry.unique_id == f"{MOCK_UPRN}_food_waste"
 
 
+async def test_rename_within_same_category_keeps_entity_identity(
+    hass: HomeAssistant, loaded_entry: MockConfigEntry
+) -> None:
+    """A council rename that keeps the same kind of waste keeps the same entity.
+
+    "Food Waste" -> "Food Waste (Weekly Collection)" still classifies as
+    food_waste, so the sensor should keep its unique_id and stay available
+    with the updated date, rather than the old entity going unavailable and
+    a new one being created.
+    """
+    coordinator = loaded_entry.runtime_data
+    food_waste, recycling, refuse = MOCK_SCHEDULE.collections
+    new_date = food_waste.next_collection + timedelta(days=7)
+    coordinator.async_set_updated_data(
+        replace(
+            MOCK_SCHEDULE,
+            collections=[
+                replace(
+                    food_waste,
+                    waste_type="Food Waste (Weekly Collection)",
+                    next_collection=new_date,
+                ),
+                recycling,
+                refuse,
+            ],
+        )
+    )
+    await hass.async_block_till_done()
+
+    entity_id = _entity_id(hass, "food_waste")
+    assert entity_id == "sensor.lewisham_council_bins_food_waste"
+    state = hass.states.get(entity_id)
+    assert state is not None
+    assert state.state == str(new_date)
+
+    ent_reg = er.async_get(hass)
+    assert ent_reg.async_get(entity_id).unique_id == f"{MOCK_UPRN}_food_waste"
+
+
+async def test_sibling_stream_disappearing_does_not_affect_unrelated_sensor(
+    hass: HomeAssistant,
+) -> None:
+    """A same-category sibling disappearing must not affect an unrelated sensor.
+
+    Two streams that share a translation key ("Recycling (blue bin)" and
+    "Recycling (green bin)", both "recycling") are ambiguous at setup, so
+    each gets a slug-based identity key. If one later disappears, the
+    survivor's own name is unchanged, so it must keep resolving via the
+    exact-name match in `_current_entry` rather than going unavailable just
+    because the category is no longer ambiguous among the remaining streams.
+    """
+    food_waste, recycling, refuse = MOCK_SCHEDULE.collections
+    recycling_blue = replace(recycling, waste_type="Recycling (blue bin)")
+    recycling_green = replace(recycling, waste_type="Recycling (green bin)")
+    initial_schedule = replace(
+        MOCK_SCHEDULE,
+        collections=[food_waste, recycling_blue, recycling_green, refuse],
+    )
+
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={CONF_UPRN: MOCK_UPRN, CONF_ADDRESS: MOCK_ADDRESS},
+        unique_id=MOCK_UPRN,
+    )
+    entry.add_to_hass(hass)
+
+    mock_service = AsyncMock()
+    mock_service.get_collection_schedule.return_value = initial_schedule
+
+    with (
+        patch(
+            "custom_components.lewisham_council_bins.get_async_client",
+            return_value=MagicMock(),
+        ),
+        patch("custom_components.lewisham_council_bins.LewishamClient"),
+        patch(
+            "custom_components.lewisham_council_bins.LewishamService",
+            return_value=mock_service,
+        ),
+    ):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+    ent_reg = er.async_get(hass)
+    blue_entity_id = ent_reg.async_get_entity_id(
+        "sensor", DOMAIN, f"{MOCK_UPRN}_recycling_blue_bin"
+    )
+    assert blue_entity_id is not None
+    assert hass.states.get(blue_entity_id).state != "unavailable"
+
+    coordinator = entry.runtime_data
+    coordinator.async_set_updated_data(
+        replace(initial_schedule, collections=[food_waste, recycling_blue, refuse])
+    )
+    await hass.async_block_till_done()
+
+    state = hass.states.get(blue_entity_id)
+    assert state is not None
+    assert state.state != "unavailable"
+    assert ent_reg.async_get(blue_entity_id).unique_id == f"{MOCK_UPRN}_recycling_blue_bin"
+
+
 async def _refresh_with_frozen_time(
     hass: HomeAssistant, loaded_entry: MockConfigEntry, frozen: datetime
 ) -> None:
@@ -337,7 +439,7 @@ def test_sensor_without_coordinator_data_is_unavailable(hass: HomeAssistant) -> 
         MOCK_UPRN,
         MOCK_ADDRESS,
     )
-    sensor = LewishamCollectionSensor(coordinator, MOCK_SCHEDULE.collections[0])
+    sensor = LewishamCollectionSensor(coordinator, MOCK_SCHEDULE.collections[0], "food_waste")
 
     assert sensor.native_value is None
     assert sensor.available is False
