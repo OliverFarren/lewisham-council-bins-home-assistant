@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from datetime import date, datetime
+from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import homeassistant.util.dt as dt_util
@@ -58,6 +58,20 @@ def _entity_id(hass: HomeAssistant, slug: str) -> str | None:
     """Look up the entity id for a sensor unique_id slug."""
     ent_reg = er.async_get(hass)
     return ent_reg.async_get_entity_id("sensor", DOMAIN, f"{MOCK_UPRN}_{slug}")
+
+
+def _next_local_midnight() -> datetime:
+    """Return the next local midnight, strictly after the real current time.
+
+    async_fire_time_changed only fires a scheduled timer if the injected
+    time looks genuinely further into the future than the real wall clock
+    (pytest_homeassistant_custom_component compares the jump against real
+    time.time()). A hardcoded calendar date eventually falls in the past
+    relative to whenever the suite actually runs and the timer silently
+    never fires, so the rollover instant must always be computed relative
+    to real "now" instead.
+    """
+    return (dt_util.now() + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
 
 
 async def test_one_sensor_per_waste_stream(
@@ -228,7 +242,17 @@ async def test_relative_timing_refreshes_at_midnight_without_polling(
     coordinator._async_unsub_refresh()
     calls_before_midnight = get_schedule.await_count
 
-    before_midnight = datetime(2026, 7, 6, 12, 0, tzinfo=dt_util.UTC)
+    midnight = _next_local_midnight()
+    before_midnight = midnight - timedelta(hours=12)
+
+    food_waste, recycling, refuse = MOCK_SCHEDULE.collections
+    coordinator.async_set_updated_data(
+        replace(
+            MOCK_SCHEDULE,
+            collections=[replace(food_waste, next_collection=midnight.date()), recycling, refuse],
+        )
+    )
+
     with patch("homeassistant.util.dt.now", return_value=before_midnight):
         coordinator.async_update_listeners()
         await hass.async_block_till_done()
@@ -236,7 +260,6 @@ async def test_relative_timing_refreshes_at_midnight_without_polling(
     state = hass.states.get(_entity_id(hass, "food_waste"))
     assert state.attributes["collection_in"] == "tomorrow"
 
-    midnight = datetime(2026, 7, 7, 0, 0, tzinfo=dt_util.UTC)
     with patch("homeassistant.util.dt.now", return_value=midnight):
         async_fire_time_changed(hass, midnight)
         await hass.async_block_till_done()
@@ -256,26 +279,28 @@ async def test_expired_collection_refreshes_at_midnight(
     coordinator.update_interval = None
     coordinator._async_unsub_refresh()
 
+    midnight = _next_local_midnight()
+    collection_day = midnight - timedelta(hours=12)
+
     food_waste, recycling, refuse = MOCK_SCHEDULE.collections
     expired_schedule = replace(
         MOCK_SCHEDULE,
         collections=[
             food_waste,
-            replace(recycling, next_collection=date(2026, 7, 7)),
+            replace(recycling, next_collection=collection_day.date()),
             refuse,
         ],
     )
     refreshed_schedule = replace(
         expired_schedule,
         collections=[
-            replace(food_waste, next_collection=date(2026, 7, 14)),
-            replace(recycling, next_collection=date(2026, 7, 21)),
+            replace(food_waste, next_collection=collection_day.date() + timedelta(days=7)),
+            replace(recycling, next_collection=midnight.date() + timedelta(days=13)),
             refuse,
         ],
     )
     get_schedule.return_value = refreshed_schedule
 
-    collection_day = datetime(2026, 7, 7, 12, 0, tzinfo=dt_util.UTC)
     with patch("homeassistant.util.dt.now", return_value=collection_day):
         coordinator.async_set_updated_data(expired_schedule)
         await hass.async_block_till_done()
@@ -285,7 +310,6 @@ async def test_expired_collection_refreshes_at_midnight(
     calls_before_midnight = get_schedule.await_count
     coordinator._debounced_refresh.async_cancel()
 
-    midnight = datetime(2026, 7, 8, 0, 0, tzinfo=dt_util.UTC)
     with (
         patch("homeassistant.util.dt.now", return_value=midnight),
         patch.object(
@@ -299,7 +323,7 @@ async def test_expired_collection_refreshes_at_midnight(
 
     request_refresh.assert_awaited_once_with()
     state = hass.states.get(_entity_id(hass, "recycling"))
-    assert state.state == "2026-07-21"
+    assert state.state == str(midnight.date() + timedelta(days=13))
     assert state.attributes["days_until_collection"] == 13
     assert state.attributes["collection_in"] == "13 days"
     assert get_schedule.await_count == calls_before_midnight + 1
