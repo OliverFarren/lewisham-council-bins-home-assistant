@@ -3292,7 +3292,7 @@ wheels = [
 
 [[package]]
 name = "lewisham-council-bins-home-assistant"
-version = "0.5.2"
+version = "0.5.3"
 source = { virtual = "." }
 
 [package.dev-dependencies]
@@ -3321,26 +3321,25 @@ runtime = [
 [package.metadata.requires-dev]
 dev = [
     { name = "homeassistant", specifier = ">=2024.6" },
-    { name = "lewisham-council-client", specifier = "==0.2.0" },
+    { name = "lewisham-council-client", specifier = "==0.3.0" },
     { name = "mypy", specifier = ">=1.14" },
     { name = "pytest-cov", specifier = ">=6.0" },
     { name = "pytest-homeassistant-custom-component" },
     { name = "ruff", specifier = ">=0.9" },
 ]
-runtime = [{ name = "lewisham-council-client", specifier = "==0.2.0" }]
+runtime = [{ name = "lewisham-council-client", specifier = "==0.3.0" }]
 
 [[package]]
 name = "lewisham-council-client"
-version = "0.2.0"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx", version = "0.27.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
     { name = "httpx", version = "0.28.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
-    { name = "structlog" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4e/8a/0a29bb85f419b026565ffd64a9208f466bdf2e8189d5163d3ed3819361ca/lewisham_council_client-0.2.0.tar.gz", hash = "sha256:1017bba93e5b3a477db8f1511d9e6badfd0ca1732c4ea7e4a3acae5f6bef0846", size = 23052, upload-time = "2026-07-01T14:13:51.334Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/26/bc/d49510bb3527e0d6c023534cff5974959d8fc16990a581e06058a2efb934/lewisham_council_client-0.3.0.tar.gz", hash = "sha256:226efa699b1398e3c369f5b0178ada7cbf9656c0367417217a4cdf16967fda9d", size = 23150, upload-time = "2026-07-12T08:38:52.588Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3e/6a/0b2466bb9cdebf3249c91f01de419224b7f0da5b26d15e3b0cfac0f72cfb/lewisham_council_client-0.2.0-py3-none-any.whl", hash = "sha256:acc50dd2275173519024d4c4a323e82fbfe7f6fb6afc3f12c6956e7a18a380bb", size = 21317, upload-time = "2026-07-01T14:13:49.923Z" },
+    { url = "https://files.pythonhosted.org/packages/6e/db/ddfe6c89c7ba11e49050f01c432fa677a6ea77a02f510d0796cb8961edd4/lewisham_council_client-0.3.0-py3-none-any.whl", hash = "sha256:151da42fa561a8c32fee60ea0323ab9eeee5d9b82900e0b02542202c730be64f", size = 22005, upload-time = "2026-07-12T08:38:51.331Z" },
 ]
 
 [[package]]
@@ -6771,15 +6770,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/8d/06/7bf7c0ec16574aeb1f6602d6a7bdb020084362fb4a9b177c5465b0aae0b6/standard_telnetlib-3.13.0.tar.gz", hash = "sha256:243333696bf1659a558eb999c23add82c41ffc2f2d04a56fae13b61b536fb173", size = 12636, upload-time = "2024-10-30T16:01:42.257Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/33/85/a1808451ac0b36c61dffe8aea21e45c64ba7da28f6cb0d269171298c6281/standard_telnetlib-3.13.0-py3-none-any.whl", hash = "sha256:b268060a3220c80c7887f2ad9df91cd81e865f0c5052332b81d80ffda8677691", size = 9995, upload-time = "2024-10-30T16:01:29.289Z" },
-]
-
-[[package]]
-name = "structlog"
-version = "26.1.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/5e/89/b4a0bcfdf4f71a3dea31379f095929613d7e4528a0996bca6aa964cd0dca/structlog-26.1.0.tar.gz", hash = "sha256:f63a716cbd1b1291cf7661de7794b455acfa4c43c5bcf1630e6ad5ddc1adb3b7", size = 1459881, upload-time = "2026-06-06T07:33:39.348Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/a9/18/489c97b834dfff9cf2fc2507cede4bcd4b11e67f84bc462acd1992496f86/structlog-26.1.0-py3-none-any.whl", hash = "sha256:e081a26d6c373e6d201eca24eede26d8ffab07f88f477822e679183428d3d91e", size = 73764, upload-time = "2026-06-06T07:33:38.046Z" },
 ]
 
 [[package]]
