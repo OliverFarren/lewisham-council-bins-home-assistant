@@ -9,7 +9,7 @@ from datetime import date, datetime
 import homeassistant.util.dt as dt_util
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_time_change
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -140,6 +140,9 @@ class LewishamCollectionSensor(CoordinatorEntity[LewishamUpdateCoordinator], Sen
             identifiers={(DOMAIN, coordinator.uprn)},
             name=coordinator.address,
             manufacturer=MANUFACTURER,
+            model="Lewisham Council Bin Collection Schedule",
+            configuration_url=coordinator.data.source_url if coordinator.data else None,
+            entry_type=DeviceEntryType.SERVICE,
         )
 
     def _current_entry(self) -> CollectionEntry | None:
