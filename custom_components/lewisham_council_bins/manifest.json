@@ -9,5 +9,5 @@
   "issue_tracker": "https://github.com/OliverFarren/lewisham-council-bins-home-assistant/issues",
   "loggers": ["lewisham_client"],
   "requirements": ["lewisham-council-client==0.3.0"],
-  "version": "0.5.5"
+  "version": "0.5.6"
 }

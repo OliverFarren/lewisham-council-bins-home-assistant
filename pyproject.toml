@@ -1,6 +1,6 @@
 [project]
 name = "lewisham-council-bins-home-assistant"
-version = "0.5.5"
+version = "0.5.6"
 description = "Home Assistant custom integration for Lewisham Council bin collections"
 requires-python = ">=3.12"
 # Runtime dependencies are declared in manifest.json and installed by HA/HACS.
