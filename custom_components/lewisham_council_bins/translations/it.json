@@ -26,6 +26,7 @@
       "cannot_connect": "Impossibile connettersi al Lewisham Council. Controlla la connessione e riprova.",
       "invalid_query": "La ricerca deve contenere almeno 3 caratteri.",
       "no_addresses_found": "Nessun indirizzo trovato. Prova con un altro CAP o nome di via.",
+      "no_schedule": "Nessun calendario di raccolta disponibile per questo indirizzo.",
       "unknown": "Si è verificato un errore imprevisto. Riprova."
     },
     "abort": {

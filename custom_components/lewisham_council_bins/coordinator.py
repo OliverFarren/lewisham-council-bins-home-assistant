@@ -19,7 +19,7 @@ from lewisham_client import (
     UpstreamUnavailableError,
 )
 
-from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
+from .const import CONF_ADDRESS, CONF_UPRN, DEFAULT_SCAN_INTERVAL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -59,19 +59,37 @@ class LewishamUpdateCoordinator(TimestampDataUpdateCoordinator[CollectionSchedul
     def __init__(
         self,
         hass: HomeAssistant,
+        entry: ConfigEntry,
         service: LewishamService,
-        uprn: str,
-        address: str,
     ) -> None:
-        super().__init__(
-            hass,
-            _LOGGER,
-            name=f"{DOMAIN}_{uprn}",
-            update_interval=DEFAULT_SCAN_INTERVAL,
-        )
+        uprn: str = entry.data[CONF_UPRN]
+        name = f"{DOMAIN}_{uprn}"
+        try:
+            super().__init__(
+                hass,
+                _LOGGER,
+                config_entry=entry,
+                name=name,
+                update_interval=DEFAULT_SCAN_INTERVAL,
+            )
+        except TypeError:
+            # config_entry= was added to DataUpdateCoordinator.__init__ in HA
+            # 2024.8; HA before that raises TypeError on the unexpected kwarg,
+            # before entering __init__'s body, so this retry has no partial
+            # side effects to undo (same reasoning as _update_failed above).
+            # HA 2026.2+ deprecates the implicit config-entry-context fallback
+            # this integration would otherwise rely on and removes it in
+            # 2026.8, so passing config_entry explicitly (the try above) is
+            # required going forward wherever the running HA supports it.
+            super().__init__(
+                hass,
+                _LOGGER,
+                name=name,
+                update_interval=DEFAULT_SCAN_INTERVAL,
+            )
         self.service = service
         self.uprn = uprn
-        self.address = address
+        self.address: str = entry.data[CONF_ADDRESS]
 
     async def _async_update_data(self) -> CollectionSchedule:
         """Fetch the current collection schedule from Lewisham Council."""

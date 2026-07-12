@@ -15,20 +15,17 @@ from lewisham_client import (
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 from pytest_homeassistant_custom_component.typing import ClientSessionGenerator
 
-from custom_components.lewisham_council_bins.const import CONF_ADDRESS, CONF_UPRN, DOMAIN
+from custom_components.lewisham_council_bins import diagnostics as diagnostics_module
+from custom_components.lewisham_council_bins.const import DOMAIN
 
-from .conftest import MOCK_ADDRESS, MOCK_SCHEDULE, MOCK_UPRN
+from .conftest import MOCK_ADDRESS, MOCK_SCHEDULE, MOCK_UPRN, build_mock_entry
 from .helpers import get_diagnostics_for_config_entry, get_diagnostics_for_device
 
 
 @pytest.fixture
 async def loaded_entry(hass: HomeAssistant) -> MockConfigEntry:
     """Set up a Lewisham Council config entry backed by MOCK_SCHEDULE."""
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={CONF_UPRN: MOCK_UPRN, CONF_ADDRESS: MOCK_ADDRESS},
-        unique_id=MOCK_UPRN,
-    )
+    entry = build_mock_entry()
     entry.add_to_hass(hass)
 
     mock_service = AsyncMock()
@@ -182,6 +179,29 @@ async def test_config_entry_diagnostics_scrubs_uprn_from_update_failed_message(
     message = diagnostics["coordinator"]["last_exception"]["message"]
     assert MOCK_UPRN not in message
     assert "**REDACTED**" in message
+
+
+async def test_config_entry_diagnostics_reports_none_when_client_package_missing(
+    hass: HomeAssistant,
+    hass_client: ClientSessionGenerator,
+    loaded_entry: MockConfigEntry,
+) -> None:
+    """If the client package's own version metadata is unavailable, report None rather than raise.
+
+    importlib.metadata.version() raises PackageNotFoundError when a package's
+    distribution metadata can't be found (e.g. an editable/vendored install).
+    """
+    with patch.object(
+        diagnostics_module, "version", side_effect=diagnostics_module.PackageNotFoundError
+    ):
+        diagnostics = await get_diagnostics_for_config_entry(hass, hass_client, loaded_entry)
+
+    assert diagnostics["versions"]["lewisham_council_client"] is None
+
+
+def test_scrub_secrets_skips_empty_secrets() -> None:
+    """An empty secret (e.g. a blank address part) is skipped rather than matched."""
+    assert diagnostics_module._scrub_secrets("some text", ["", "text"]) == "some **REDACTED**"
 
 
 async def test_device_diagnostics_includes_entities_and_redacts_device_name(

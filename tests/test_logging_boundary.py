@@ -27,7 +27,7 @@ from lewisham_client import LewishamClient, LewishamParser, LewishamService
 
 from custom_components.lewisham_council_bins.coordinator import LewishamUpdateCoordinator
 
-from .conftest import MOCK_ADDRESS, MOCK_UPRN
+from .conftest import MOCK_ADDRESS, MOCK_UPRN, build_mock_entry
 
 _CLIENT_LOGGER_NAMES = [
     "lewisham_client.clients.lewisham.client",
@@ -79,7 +79,8 @@ def _build_coordinator(
     http_client = httpx.AsyncClient(transport=transport)
     client = LewishamClient(http_client=http_client)
     service = LewishamService(client=client, parser=LewishamParser())
-    return LewishamUpdateCoordinator(hass, service, MOCK_UPRN, MOCK_ADDRESS)
+    entry = build_mock_entry()
+    return LewishamUpdateCoordinator(hass, entry, service)
 
 
 @pytest.mark.parametrize("logger_name", _CLIENT_LOGGER_NAMES)

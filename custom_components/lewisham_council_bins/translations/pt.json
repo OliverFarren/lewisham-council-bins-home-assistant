@@ -26,6 +26,7 @@
       "cannot_connect": "Não foi possível ligar ao Lewisham Council. Verifique a sua ligação e tente novamente.",
       "invalid_query": "A pesquisa deve ter pelo menos 3 caracteres.",
       "no_addresses_found": "Não foram encontradas moradas. Tente outro código postal ou nome de rua.",
+      "no_schedule": "Não existe nenhum calendário de recolha disponível para esta morada.",
       "unknown": "Ocorreu um erro inesperado. Tente novamente."
     },
     "abort": {

@@ -26,6 +26,7 @@
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
       "invalid_query": "Search query must be at least 3 characters.",
       "no_addresses_found": "No addresses found. Try a different postcode or street name.",
+      "no_schedule": "No collection schedule is available for this address.",
       "unknown": "[%key:common::config_flow::error::unknown%]"
     },
     "abort": {
